@@ -82,7 +82,7 @@ G_{ij}(c)A_{ij}(c) & (\forall j\neq i)\\
 \end{array}
 \right.
 $$
-$G_{ij}(c)$を生成確率（状態$i$から状態$j$が発生する確率）、$A_{ij}(c)$を受容確率（状態$i$から状態$j$に実際に遷移する確率）と呼び、これらを成分に持つ行列$G(c),\space A(c)$をそれぞれ生成行列、受容行列と呼ぶ。$G_{ij}(c),\space A_{ij}(c)$はともに条件付き確率である。
+$G_{ij}(c)$を**生成確率**（状態$i$から状態$j$が発生する確率）、$A_{ij}(c)$を**受理確率**（状態$i$から状態$j$に実際に遷移する確率）と呼び、これらを成分に持つ行列$G(c),\space A(c)$をそれぞれ**生成行列**、**受理行列**と呼ぶ。$G_{ij}(c),\space A_{ij}(c)$はともに条件付き確率である。
 
 $P_{ij}(c)$の定義から、遷移行列$P(c)$は確率行列になっている（$\sum_j P_{ij}(c)=1$を満たす）。
 
@@ -222,6 +222,86 @@ $$
 
 #### 十分条件
 
+##### 定義1（弱エルゴード）
+
+inhomogeneousマルコフ連鎖が弱エルゴードとは、
+$\forall m\geq1,i,j\in\mathcal{R}$に対し、
+$$
+\lim_{k\to\infty}\left(P_{il}(m, k)-P_{jl}(m,k)\vline X(m)=i\right)=0
+$$
+が成り立つこと。ただし、$P_{il}(m, k)=P\left\{X(k)=l\vline X(m)=i\right\}$
+
+※$X(0)$と$X(k)$の関連がなくなることを暗に言っている。
+
+##### 定義2（強エルゴード）
+
+$\sum_{i=1}^{|\mathcal{R}|}\pi_i=1,\forall i(\pi_i>0)$を満たす$\pi$が存在して、$\space\forall m\geq1,i,j\in\mathcal{R}$に対して$\lim_{k\to\infty}P_{ij}(m,k)=\pi_j$を満たす。
+※$X(k)$が従う分布が収束するということ
+
+注：homogeneousマルコフ連鎖には強弱の区別はない。
+
+##### 定理3
+
+inhomogeneousマルコフ連鎖が弱エルゴード$\Leftrightarrow$正の狭義単調増加列$\{k_l\}$があって、$\sum_{l=0}^\infty(1-\tau_1(P(k_l,k_{k+1})))=\infty$を満たす。$n\times n$のエルゴード係数行列$\tau_1$は以下で定義される。$\tau_1(P)=1-\text{min}_{i,j}\sum_{l=1}^n\text{min}(P_{il},P_{jl})$
+
+##### 定理4
+
+inhomogeneousマルコフ連鎖が以下を満たすとき、強エルゴード
+
+- マルコフ連鎖が弱エルゴード性を持つ
+
+- 任意の$k$に対し、ある$\pi(k)$が存在して、$P\pi(k)=\pi(k), \sum_{i=1}^{|\mathcal{R|}|\pi_i(k)|=1$を満たす
+
+- $$
+  \sum_{k=0}^\infty\sum_{i=1}^{|\mathcal{R}|}|\pi_i(k)-\pi_i(k+1)|<\infty\quad\cdots(1)
+  $$
+
+さらに、$\pi=\lim_{k\to\infty}\pi(k)$なら、$\pi$は定義2のベクトル$\pi$と一致する。
+
+受理確率、生成確率に、homogeneousなアルゴリズムに対する条件と同じものを仮定すると、各$k\geq0$に対して$P(k,k+1)$を遷移確率、$\bold{q}(c_k)$を定常分布に持つマルコフ連鎖が存在する。（$\bold{q}(c_k)$は$P$の固有ベクトル）
+
+さらにいくつか仮定すると、$c_k\to0$の元で$\bold{q}(c_k)$が$\pi\left(\pi_i=\left\{\begin{array}{ll}|\mathcal{R}_{opt}|^{-1}&i\in\mathcal{R}_{opt}\\0&\text{O.W.}\end{array}\right.\right)$に収束するようにできる。
+
+$\pi(k)=\bold{q}(c_k)$として定理4を適用すると、$\bold{q}(c_k)$を定常分布にもつマルコフ連鎖が強エルゴード性を持つことは、
+
+1. マルコフ連鎖が弱エルゴードである
+2. $\bold{q}(c_k),k=0,1,2,\dots$が$(1)$を満たす
+
+ことだと言い換えることができる。
+$\pi_i$の定義と強エルゴード性より、
+$$
+\begin{align}
+&\quad\lim_{k\to\infty}P\left(X(k)\in\mathcal{R}_{opt}\right)\\
+&=\lim_{k\to\infty}\sum_{j\in\mathcal{R}_{opt}}P\left\{X(k)=j\right\}\\
+&=\sum_{j\in\mathcal{R}_{opt}}\lim_{k\to\infty}P\left\{X(k)=j\right\}(有限和だからok)\\
+&=1
+\end{align}
+$$
+がわかり、大域的最適解に収束することがわかる。
+
+続いて、アルゴリズムと関連したマルコフ連鎖が強エルゴード性を満たすための$\{c_k\}$に対する十分条件を紹介する。
+
++ オリジナルの定式化に対する条件
+
+  - $\exists k_0\geq2,\forall k\geq k_0\space\text{s.t.}\space c_k\geq\frac{|\mathcal{R}|\Delta C_{max}}{\text{log}k}(\Delta C_{max}=\text{max}\left\{C(i)|i\in\mathcal{R}\right\}-\text{min}\left\{C(i)|i\in\mathcal{R}\right\})$
+  - $\forall k\geq2,c_k\geq\frac{n\Delta}{\text{log}k}(n,\Delta$は$(2)$のもの$)$
+    明らかに、$n\leq|\mathcal{R}|,\Delta\leq\Delta C_{max}$だから、これは上よりもタイトなbound。
+  - 最もタイトなbound
+    $\mathcal{R}_{max}=\left\{i\in\mathcal{R}|\forall j\in\mathcal{R}_i,C(j)\leq C(i)\right\}$を局所最適状態の集合、
+    $r=\text{min}_{i\in\mathcal{R}-\mathcal{R}_{max}}\text{max}_{j\in\mathcal{R}}d(i,j)$を局所最適状態以外の状態からその他の状態への遷移数の最小値とする$(d(i,j)$は状態$i$から状態$j$への最小遷移数$)$
+    この時、$\forall k\geq2,c_k\geq\frac{r\Delta}{\text{log}k}$であれば良い。
+
++ 一般的な条件
+
+  - $(2)$
+    $n$を、各状態から大域的に最適な状態への遷移数の最小値の最大値とする。
+    また、$\Delta=\text{max}\left\{C(j)-C(i)|i,j,\in\mathcal{R},C(j)>C(i)\right\}$
+    $\underline{A}(c)=\text{min}\{A_{ij}(c)|i\in\mathcal{R},j\in\mathcal{R}_i\}$とする。
+
+    $A,G$がこれまでの仮定を満たし、$\sum_{k=1}^{\infty}(\underline{A}({c_k}_n))^n=\infty$が成り立つなら定常分布が$\pi$に収束する。
+
+最後に、最適解に収束するための十分条件を述べる。
+
 #### 必要十分条件
 
 
@@ -230,17 +310,56 @@ $$
 
 ### 1. 定式化たち
 
+ここで紹介する定式化は、上で説明した条件を満たしている。
+
 #### Homogeneous
 
-+ $$
-  A_{ij}(c)=\text{exp}\left\{-(C(i)-C_{opt})/c\right\}\\
++ オリジナル
+  $$
+  A_{ij}(c)=\text{exp}\left\{-(C(j)-C(i))/c\right\}\\
   G=\text{uniform distribution}\\
-  q_i(c)=\frac{\text{exp}\left\{-(C(i)-C_{opt})/c\right\}}{\sum_{j\in\mathcal{R}}\text{exp}\left\{-(C(i)-C_{opt})/c\right\}}
+  q_i(c)=\frac{\text{exp}\left\{-(C(i)-C_{opt})/c\right\}}{\sum_{j\in\mathcal{R}}\text{exp}\left\{-(C(j)-C_{opt})/c\right\}}
   $$
 
-+ 
++ バリエーション1
+  $G_{ij}(T)=\left\{\begin{array}{ll}|\mathcal{R_i}|^{-1}&j\in\mathcal{R}\\0&O.W.\end{array}\right.$
+  $A$：オリジナルと一緒
+  $q_i(c)=\frac{|\mathcal{R}_i|\text{exp}\left\{-(C(i)-C_{opt})/c\right\}}{\sum_{j\in\mathcal{R}}|\mathcal{R}_j|\text{exp}\left\{-(C(j)-C_{opt})/c\right\}}$
 
-#### Inhomogeneous
++ バリエーション2
+  $G_{ij}(T)=\frac{Q_{ij}}{\sum_{l\in\mathcal{R}}Q_{il}}, (Q=Q^T)$
+  $A$：オリジナルと一緒
+  $q_i(c)=\frac{(\sum_{l\in\mathcal{R}}Q_{il})\text{exp}\left\{-(C(i)-C_{opt})/c\right\}}{\sum_{j\in\mathcal{R}}(\sum_{l\in\mathcal{R}}Q_{jl})\text{exp}\left\{-(C(j)-C_{opt})/c\right\}}$
 
 ### 2. cooling schedule
 
+良い解を得るためには、
+
+1. パラメーターの初期値
+2. アルゴリズムの終了条件
+   パラメーターの値
+3. パラメーターの更新方法・更新条件
+   アルゴリズムに対応するマルコフ連鎖の長さ
+
+を適切に設定する必要があります。
+これらの条件を、cooling scheduleと呼びます。
+
+今回は大雑把な方針を述べるに留めます。
+
+#### 温度パラメーターの初期値について
+
+あり得る状態のほとんど全てに対して、受理確率が1になるように選択します。
+つまり、アルゴリズムの初期において、なるべく多くの状態への遷移が可能になるように初期値を設定します。
+
+#### 終了条件について
+
+いくつかの連続したマルコフ連鎖の、終了時の状態が一致していたら終了する
+
+#### パラメーターの減らし方
+
+オリジナルのアルゴリズムでは、更新のたびに0.995倍するという方針が取られており、これが広く使われています。この方針では$\frac{c_{k+1}}{c_k}$が一定になりますが、$c{k+1}-c_k$が一定の値を取るような更新方法もあります。
+
+温度パラメーターを一度に大きく減らすほど、対応するマルコフ連鎖が長くなり、定常分布への収束が遅くなります。
+少しずつ減らすようにすれば、対応するマルコフ連鎖は短くなりますが、温度パラメーターの収束が遅くなるため、これらはトレードオフの関係にあります。
+
+inhomogeneousなアルゴリズムでは、パラメーターを$O(|\text{log}k|^{-1})$よりもゆっくり収束させる必要があります。
